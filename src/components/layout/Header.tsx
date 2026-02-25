@@ -22,6 +22,9 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
 
+  // Hide user-facing navigation for admins
+  const showUserNavigation = isAuthenticated && !isAdmin
+
   const handleLogout = async () => {
     await logout()
     navigate('/login')
@@ -38,7 +41,7 @@ export function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-1 ml-4">
-          {navLinks.map((link) => (
+          {showUserNavigation && navLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}
@@ -53,7 +56,7 @@ export function Header() {
 
         {/* Search */}
         <div className="hidden md:flex flex-1 max-w-xs ml-auto">
-          {searchOpen && (
+          {showUserNavigation && searchOpen && (
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search products..." className="pl-9" autoFocus onBlur={() => setSearchOpen(false)} />
@@ -64,20 +67,24 @@ export function Header() {
         {/* Actions */}
         <div className="flex items-center gap-1 ml-auto md:ml-0">
           <ThemeToggle />
-          <Button variant="ghost" size="icon" onClick={() => setSearchOpen(!searchOpen)} className="hidden md:flex">
-            <Search className="h-5 w-5" />
-          </Button>
-
-          <Link to="/cart" className="relative">
-            <Button variant="ghost" size="icon">
-              <ShoppingCart className="h-5 w-5" />
-              {totalItems > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs rounded-full">
-                  {totalItems}
-                </Badge>
-              )}
+          {showUserNavigation && (
+            <Button variant="ghost" size="icon" onClick={() => setSearchOpen(!searchOpen)} className="hidden md:flex">
+              <Search className="h-5 w-5" />
             </Button>
-          </Link>
+          )}
+
+          {showUserNavigation && (
+            <Link to="/cart" className="relative">
+              <Button variant="ghost" size="icon">
+                <ShoppingCart className="h-5 w-5" />
+                {totalItems > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs rounded-full">
+                    {totalItems}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
+          )}
 
           {isAuthenticated ? (
             <>
@@ -114,7 +121,7 @@ export function Header() {
       {/* Mobile Nav */}
       {mobileOpen && (
         <div className="md:hidden border-t border-border bg-card px-4 py-3 flex flex-col gap-1">
-          {navLinks.map((link) => (
+          {showUserNavigation && navLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}

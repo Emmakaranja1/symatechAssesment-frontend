@@ -59,6 +59,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setToken(jwt)
       setUser(userData)
       toast({ title: 'Welcome back!', description: `Hello, ${userData?.name}` })
+      
+      // Redirect admin to dashboard, regular users to home
+      if (userData?.role === 'admin') {
+        window.location.href = '/admin'
+      }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } }
       toast({
