@@ -9,6 +9,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table'
 import { AddProductModal } from '@/components/admin/AddProductModal'
+import { EditProductModal } from '@/components/admin/EditProductModal'
 import { ConfirmModal } from '@/components/admin/ConfirmModal'
 import { OrderDetailModal } from '@/components/admin/OrderDetailModal'
 import { toast } from '@/hooks/use-toast'
@@ -642,12 +643,13 @@ function ProductsTab({ search, products, onRefresh, onAdd }: {
   onRefresh: () => void
   onAdd: () => void
 }) {
-  const filtered = products.filter(p =>
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string } | null>(null)
+  const [editTarget, setEditTarget] = useState<AdminProduct | null>(null)
+
+  const filtered = products.filter((p: AdminProduct) =>
     getProductName(p).toLowerCase().includes(search.toLowerCase()) ||
     (p.category || '').toLowerCase().includes(search.toLowerCase())
   )
-  const [deleteTarget, setDeleteTarget] = useState<{ id: number; title: string } | null>(null)
-  const [editTarget, setEditTarget] = useState<AdminProduct | null>(null)
 
   const lowStock = products.filter(p => (p.stock ?? 0) < 10 && (p.stock ?? 0) > 0).length
   const outOfStock = products.filter(p => (p.stock ?? 0) === 0).length
@@ -759,25 +761,15 @@ function ProductsTab({ search, products, onRefresh, onAdd }: {
         </Table>
       </div>
 
-      {editTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-card rounded-xl border border-border p-6 w-full max-w-sm shadow-2xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Edit Product</h3>
-              <button onClick={() => setEditTarget(null)} className="text-muted-foreground hover:text-foreground">
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <p className="text-sm text-muted-foreground mb-4">
-              Editing: <strong>{getProductName(editTarget)}</strong>
-            </p>
-            <p className="text-xs text-muted-foreground bg-muted/50 rounded p-3">
-              Full product editing is available via the backend API. Current price: KES {parsePrice(editTarget.price).toLocaleString()} | Stock: {editTarget.stock}
-            </p>
-            <Button variant="outline" className="w-full mt-4" onClick={() => setEditTarget(null)}>Close</Button>
-          </div>
-        </div>
-      )}
+      <EditProductModal
+        open={!!editTarget}
+        onOpenChange={(open) => !open && setEditTarget(null)}
+        product={editTarget}
+        onSuccess={() => {
+          setEditTarget(null)
+          onRefresh()
+        }}
+      />
 
       <ConfirmModal
         open={!!deleteTarget}
