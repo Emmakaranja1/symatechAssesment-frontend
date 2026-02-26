@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { ProductCard } from '@/components/products/ProductCard'
+import ProductCard from '@/components/products/ProductCard'
 import { MainLayout } from '@/components/layout/MainLayout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
