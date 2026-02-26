@@ -39,25 +39,76 @@ export default function CheckoutPage() {
     return null
   }
 
+  const formatPhoneNumber = (phone: string): string => {
+    // Remove all non-digit characters
+    const cleanPhone = phone.replace(/\D/g, '')
+    
+    // If starts with 254, return as is
+    if (cleanPhone.startsWith('254') && cleanPhone.length === 12) {
+      return cleanPhone
+    }
+    
+    // If starts with 0 and has 10 digits, convert to 254 format
+    if (cleanPhone.startsWith('0') && cleanPhone.length === 10) {
+      return '254' + cleanPhone.substring(1)
+    }
+    
+    // If starts with 7 and has 9 digits, add 254 prefix
+    if (cleanPhone.startsWith('7') && cleanPhone.length === 9) {
+      return '254' + cleanPhone
+    }
+    
+    // Return original if no pattern matches
+    return phone
+  }
+
   const placeOrder = async () => {
     setLoading(true)
     try {
       // Create order for each item in cart (backend expects single product per order)
       const firstItem = items[0]
+      console.log('Creating order for product:', firstItem.product.id, 'quantity:', firstItem.quantity)
+      
       const res = await createOrder({
         product_id: firstItem.product.id,
         quantity: firstItem.quantity,
       })
 
+      console.log('Order creation response:', res.data)
       const orderId = res.data.data?.order_id
+      console.log('Extracted order ID:', orderId)
 
       if (payment === 'mpesa' && orderId) {
         const phone = mpesaPhone || address.phone
-        await initiateMpesa({
-          order_id: orderId,
-          phone_number: phone,
-        })
-        toast({ title: 'M-PESA STK Push sent!', description: 'Check your phone to complete payment.' })
+        const formattedPhone = formatPhoneNumber(phone)
+        console.log('Initiating M-Pesa payment for order:', orderId, 'original phone:', phone, 'formatted phone:', formattedPhone)
+        
+        if (!formattedPhone || formattedPhone.length < 12) {
+          toast({
+            title: 'Invalid Phone Number',
+            description: 'Please enter a valid M-Pesa phone number (e.g., 2547XXXXXXXX or 07XXXXXXXX)',
+            variant: 'destructive',
+          })
+          return
+        }
+        
+        try {
+          const mpesaResponse = await initiateMpesa({
+            order_id: orderId,
+            phone_number: formattedPhone,
+          })
+          console.log('M-Pesa initiation response:', mpesaResponse.data)
+          toast({ title: 'M-PESA STK Push sent!', description: 'Check your phone to complete payment.' })
+        } catch (mpesaError: any) {
+          console.error('M-Pesa initiation error:', mpesaError)
+          const error = mpesaError as { response?: { data?: { message?: string } } }
+          toast({
+            title: 'M-Pesa Payment Failed',
+            description: error?.response?.data?.message || 'Could not initiate M-Pesa payment. Please check your phone number and try again.',
+            variant: 'destructive',
+          })
+          return // Don't proceed if M-Pesa fails
+        }
       } else {
         toast({ title: 'Order placed!', description: 'Your order has been placed successfully.' })
       }
@@ -65,6 +116,7 @@ export default function CheckoutPage() {
       clearCart()
       navigate('/orders')
     } catch (err: unknown) {
+      console.error('Order placement error:', err)
       const error = err as { response?: { data?: { message?: string } } }
       toast({
         title: 'Order failed',
