@@ -1,10 +1,16 @@
 import client from './client'
-
+import type { 
+  ApiResponse, 
+  PaginatedResponse, 
+  Payment, 
+  MpesaInitiateResponse, 
+  FlutterwaveInitiateResponse, 
+  PaymentVerifyResponse 
+} from '@/lib/types'
 
 export interface MpesaInitiatePayload {
-  amount: number
+  order_id: number
   phone_number: string   
-  order_id: number       
 }
 
 export interface MpesaVerifyPayload {
@@ -12,10 +18,9 @@ export interface MpesaVerifyPayload {
 }
 
 export interface FlutterwaveInitiatePayload {
-  amount: number
-  currency: string         
-  payment_method: string   
   order_id: number
+  email: string
+  name: string
 }
 
 export interface FlutterwaveVerifyPayload {
@@ -23,20 +28,16 @@ export interface FlutterwaveVerifyPayload {
 }
 
 export const initiateMpesa = (data: MpesaInitiatePayload) =>
-  client.post('/payments/mpesa/initiate', data)
-
+  client.post<ApiResponse<MpesaInitiateResponse>>('/payments/mpesa/initiate', data)
 
 export const verifyMpesa = (data: MpesaVerifyPayload) =>
-  client.post('/payments/mpesa/verify', data)
-
+  client.post<ApiResponse<PaymentVerifyResponse>>('/payments/mpesa/verify', data)
 
 export const initiateFlutterwave = (data: FlutterwaveInitiatePayload) =>
-  client.post('/payments/flutterwave/initiate', data)
-
+  client.post<ApiResponse<FlutterwaveInitiateResponse>>('/payments/flutterwave/initiate', data)
 
 export const verifyFlutterwave = (data: FlutterwaveVerifyPayload) =>
-  client.post('/payments/flutterwave/verify', data)
-
+  client.post<ApiResponse<PaymentVerifyResponse>>('/payments/flutterwave/verify', data)
 
 export const getUserPayments = () =>
-  client.get('/payments')
+  client.get<PaginatedResponse<Payment>>('/payments')

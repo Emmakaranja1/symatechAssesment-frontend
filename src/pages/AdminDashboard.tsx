@@ -22,7 +22,7 @@ import {
   exportActivityLogExcel, exportActivityLogPdf,
   exportNormalUserActivityExcel, exportNormalUserActivityPdf,
 } from '@/api/reports'
-import { products as mockProducts, orders as mockOrders, users as mockUsers } from '@/lib/mock-data'
+import { products as mockProducts, users as mockUsers } from '@/lib/mock-data'
 import {
   LayoutDashboard, Package, ShoppingCart, Users, BarChart3,
   Activity, Plus, Edit, Trash2, ToggleLeft, ToggleRight,
@@ -120,11 +120,11 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const [products, setProducts] = useState<AdminProduct[]>(
-    mockProducts.map(p => ({ ...p, name: p.title, images: [p.image] }))
+    mockProducts.map(p => ({ ...p, name: p.title || p.name || 'Untitled Product', images: [p.image] }))
   )
-  const [orders, setOrders] = useState<AdminOrder[]>(mockOrders as unknown as AdminOrder[])
+  const [orders, setOrders] = useState<AdminOrder[]>([])
   const [usersList, setUsersList] = useState<AdminUser[]>(
-    mockUsers.map(u => ({ ...u, status: u.active }))
+    mockUsers.map(u => ({ ...u, status: u.active ? 'active' : 'inactive' }))
   )
   const [dashboardStats, setDashboardStats] = useState<Record<string, unknown> | null>(null)
   const [registrationTrends, setRegistrationTrends] = useState<{ date: string; registrations: number }[]>([])
@@ -144,8 +144,8 @@ export default function AdminDashboard() {
         if (Array.isArray(d) && d.length) { setProducts(d); anyLive = true }
       }),
       getAllOrders().then(res => {
-        const d = res.data?.data || res.data?.data || res.data
-        const arr = Array.isArray(d) ? d : d?.data
+        const d = res.data?.data || res.data
+        const arr = Array.isArray(d) ? d : []
         if (Array.isArray(arr) && arr.length) { setOrders(arr); anyLive = true }
       }),
       getAllUsers().then(res => {

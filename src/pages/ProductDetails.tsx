@@ -83,7 +83,7 @@ export default function ProductDetails() {
           <div className="relative aspect-square overflow-hidden rounded-xl bg-muted">
             <img
               src={product.image}
-              alt={product.title}
+              alt={product.title || product.name}
               className="h-full w-full object-cover"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560343090-f0409e92791a?w=600&h=600&fit=crop'
@@ -99,18 +99,18 @@ export default function ProductDetails() {
           {/* Details */}
           <div className="flex flex-col">
             <Badge variant="outline" className="w-fit mb-3">{product.category}</Badge>
-            <h1 className="font-display text-3xl font-bold mb-3">{product.title}</h1>
+            <h1 className="font-display text-3xl font-bold mb-3">{product.title || product.name}</h1>
 
             <div className="flex items-center gap-2 mb-4">
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className={`h-4 w-4 ${i < Math.floor(product.rating) ? 'fill-warning text-warning' : 'text-muted'}`}
+                    className={`h-4 w-4 ${i < Math.floor(product.rating || 0) ? 'fill-warning text-warning' : 'text-muted'}`}
                   />
                 ))}
               </div>
-              <span className="text-sm text-muted-foreground">({product.rating})</span>
+              <span className="text-sm text-muted-foreground">({product.rating || 0})</span>
             </div>
 
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">{product.description}</p>

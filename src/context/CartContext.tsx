@@ -51,13 +51,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }) => ({
             product: item.product || {
               id: item.product_id || 0,
+              name: item.title || '',
               title: item.title || '',
+              sku: '',
               price: item.price || 0,
               stock: item.stock || 0,
               category: item.category || '',
               description: item.description || '',
               image: item.image || '',
               rating: item.rating || 0,
+              active: true,
+              featured: false,
+              status: 'active' as const,
             },
             quantity: item.quantity || 1,
           }))

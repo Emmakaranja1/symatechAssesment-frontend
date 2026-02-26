@@ -21,6 +21,8 @@ interface AddProductModalProps {
 export function AddProductModal({ open, onOpenChange, onSuccess }: AddProductModalProps) {
   const [form, setForm] = useState({
     title: '',
+    name: '',
+    sku: '',
     category: '',
     price: '',
     stock: '',
@@ -35,16 +37,20 @@ export function AddProductModal({ open, onOpenChange, onSuccess }: AddProductMod
     setLoading(true)
     try {
       await createProduct({
-        name: form.title,          
+        name: form.name || form.title,          
+        title: form.title,
+        sku: form.sku || `PROD-${Date.now()}`,
         category: form.category,
         price: Number(form.price),
         stock: Number(form.stock),
         description: form.description,
         image: form.image,
         rating: Number(form.rating),
+        active: true,
+        featured: false,
       })
       toast({ title: 'Product added', description: `${form.title} has been added successfully.` })
-      setForm({ title: '', category: '', price: '', stock: '', description: '', image: '', rating: '' })
+      setForm({ title: '', name: '', sku: '', category: '', price: '', stock: '', description: '', image: '', rating: '' })
       onOpenChange(false)
       onSuccess?.()
     } catch {
@@ -69,6 +75,24 @@ export function AddProductModal({ open, onOpenChange, onSuccess }: AddProductMod
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 required
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="Product name"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="sku">SKU</Label>
+              <Input
+                id="sku"
+                value={form.sku}
+                onChange={(e) => setForm({ ...form, sku: e.target.value })}
+                placeholder="Product SKU (auto-generated if empty)"
               />
             </div>
             <div className="space-y-1">

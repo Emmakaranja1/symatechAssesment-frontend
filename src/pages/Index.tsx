@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Search, SlidersHorizontal } from 'lucide-react'
 import { getProducts } from '@/api/products'
+import client from '@/api/client'
 import { Product } from '@/lib/types'
 import { products as mockProducts, categories } from '@/lib/mock-data'
 
@@ -15,28 +16,58 @@ const Index = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getProducts()
-      .then((res) => {
+    // Try multiple endpoints to find products
+    const fetchProducts = async () => {
+      try {
+        // First try public products endpoint
+        const res = await client.get('/products')
+        console.log('Public /products response:', res.data)
         const data = res.data?.data || res.data
         if (Array.isArray(data) && data.length > 0) {
+          console.log('Setting products from public API:', data.length)
           setProducts(data)
+          return
         }
-        // else keep mock data
-      })
-      .catch(() => {
-        // Keep mock data on error - graceful degradation
+      } catch (error) {
+        console.log('Public /products failed, trying admin/products')
+      }
+
+      try {
+        // Try admin products (might work with token)
+        const res = await client.get('/admin/products')
+        console.log('Admin /admin/products response:', res.data)
+        const data = res.data?.data || res.data
+        if (Array.isArray(data) && data.length > 0) {
+          console.log('Setting products from admin API:', data.length)
+          setProducts(data)
+          return
+        }
+      } catch (error) {
+        console.log('Admin /admin/products failed')
+      }
+
+      console.log('Keeping mock data - no API products found')
+      // Ensure we always have products to display
+      setProducts(mockProducts)
+    }
+
+    fetchProducts()
+      .catch((error) => {
+        console.error('All API calls failed:', error)
+        setProducts(mockProducts)
       })
       .finally(() => setLoading(false))
   }, [])
 
   const filtered = products.filter((p) => {
     const matchCategory = selectedCategory === 'All' || p.category === selectedCategory
-    const matchSearch = p.title.toLowerCase().includes(search.toLowerCase())
+    const title = p.title || p.name || ''
+    const matchSearch = title.toLowerCase().includes(search.toLowerCase())
     return matchCategory && matchSearch
   })
 
   // Derive categories from actual product data
-  const dynamicCategories = ['All', ...Array.from(new Set(products.map((p) => p.category)))]
+  const dynamicCategories = ['All', ...Array.from(new Set(products.map((p) => p.category).filter(Boolean)))]
 
   return (
     <MainLayout>

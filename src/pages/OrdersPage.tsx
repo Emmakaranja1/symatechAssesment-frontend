@@ -4,7 +4,6 @@ import { Badge } from '@/components/ui/badge'
 import { Package } from 'lucide-react'
 import { getOrders } from '@/api/orders'
 import { Order } from '@/lib/types'
-import { orders as mockOrders } from '@/lib/mock-data'
 
 const statusColor: Record<string, string> = {
   pending: 'bg-warning/10 text-warning border-warning/20',
@@ -22,13 +21,14 @@ export default function OrdersPage() {
     getOrders()
       .then((res) => {
         const data = res.data?.data || res.data
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data)) {
           setOrders(data)
-        } else {
-          setOrders(mockOrders)
         }
       })
-      .catch(() => setOrders(mockOrders))
+      .catch((error) => {
+        console.error('Failed to fetch orders:', error)
+        setOrders([])
+      })
       .finally(() => setLoading(false))
   }, [])
 
@@ -54,23 +54,23 @@ export default function OrdersPage() {
               <div key={order.id} className="rounded-lg border border-border bg-card p-5">
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <p className="font-semibold">{order.id}</p>
-                    <p className="text-xs text-muted-foreground">{order.date}</p>
+                    <p className="font-semibold">#{order.id}</p>
+                    <p className="text-xs text-muted-foreground">{order.created_at ? new Date(order.created_at).toLocaleDateString() : '—'}</p>
                   </div>
                   <div className="flex flex-col items-end gap-2">
                     <Badge variant="outline" className={statusColor[order.status]}>
                       {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                     </Badge>
-                    <p className="font-bold text-primary">KES {order.total.toLocaleString()}</p>
+                    <p className="font-bold text-primary">KES {order.total_price.toLocaleString()}</p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {order.items.map((item, i) => (
-                    <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground bg-muted rounded-md px-2 py-1">
-                      <span>{item.product.title}</span>
-                      <span className="font-medium">×{item.quantity}</span>
+                  {order.product && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground bg-muted rounded-md px-2 py-1">
+                      <span>{order.product.title || order.product.name}</span>
+                      <span className="font-medium">×{order.quantity}</span>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             ))}

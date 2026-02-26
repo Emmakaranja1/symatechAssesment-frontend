@@ -18,7 +18,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <Link to={`/product/${product.id}`} className="block relative aspect-[4/3] overflow-hidden bg-muted">
         <img
           src={product.image}
-          alt={product.title}
+          alt={product.title || product.name}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {
             (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&h=300&fit=crop'
@@ -47,7 +47,7 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
         <Link to={`/product/${product.id}`}>
           <h3 className="font-semibold text-sm leading-tight mb-2 line-clamp-2 hover:text-primary transition-colors">
-            {product.title}
+            {product.title || product.name}
           </h3>
         </Link>
         <div className="flex items-center justify-between">

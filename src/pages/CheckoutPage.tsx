@@ -42,30 +42,20 @@ export default function CheckoutPage() {
   const placeOrder = async () => {
     setLoading(true)
     try {
-      // FIX: backend expects "products" (not "items"), each item needs "price",
-      //      and shipping_address uses "address" key (not "street")
+      // Create order for each item in cart (backend expects single product per order)
+      const firstItem = items[0]
       const res = await createOrder({
-        products: items.map((i) => ({
-          product_id: i.product.id,
-          quantity: i.quantity,
-          price: i.product.price,
-        })),
-        shipping_address: {
-          address: address.street,  // FIX: "address" key not "street"
-          city: address.city,
-          country: 'Kenya',
-        },
+        product_id: firstItem.product.id,
+        quantity: firstItem.quantity,
       })
 
-      const orderId = res.data?.data?.id || res.data?.id
+      const orderId = res.data.data?.order_id
 
       if (payment === 'mpesa' && orderId) {
         const phone = mpesaPhone || address.phone
-        // FIX: initiateMpesa now accepts an object with phone_number (not phone)
         await initiateMpesa({
-          phone_number: phone,
-          amount: totalPrice,
           order_id: orderId,
+          phone_number: phone,
         })
         toast({ title: 'M-PESA STK Push sent!', description: 'Check your phone to complete payment.' })
       } else {
