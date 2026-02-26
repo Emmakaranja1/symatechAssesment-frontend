@@ -134,50 +134,94 @@ export default function AdminDashboard() {
 
   const fetchAllData = useCallback(async () => {
     setRefreshing(true)
-    let anyLive = false
+    let apiSuccess = false
 
     await Promise.allSettled([
       getAdminProducts().then(res => {
-        const d = res.data?.data?.products || res.data?.products || res.data?.data || res.data
         console.log('Admin products response:', res)
-        console.log('Products data:', d)
-        if (Array.isArray(d) && d.length) { 
-          const formattedProducts = d.map((p: any) => ({
+        console.log('Response data structure:', JSON.stringify(res.data, null, 2))
+        
+        let productsArray: any[] = []
+        
+        // Try different possible response structures
+        if (Array.isArray((res.data as any)?.data?.products)) {
+          productsArray = (res.data as any).data.products
+        } else if (Array.isArray((res.data as any)?.products)) {
+          productsArray = (res.data as any).products
+        } else if (Array.isArray((res.data as any)?.data)) {
+          productsArray = (res.data as any).data
+        } else if (Array.isArray(res.data)) {
+          productsArray = res.data as any[]
+        } else if ((res.data as any)?.data?.products && typeof (res.data as any).data.products === 'object') {
+          // If products is an object, try to extract array from it
+          productsArray = Object.values((res.data as any).data.products).filter(Array.isArray) as any[]
+        }
+        
+        console.log('Extracted products array:', productsArray)
+        
+        if (Array.isArray(productsArray) && productsArray.length) { 
+          const formattedProducts = productsArray.map((p: any) => ({
             ...p,
             name: p.name || p.title || 'Untitled Product',
             images: p.images || (p.image ? [p.image] : [])
           }))
           console.log('Formatted products:', formattedProducts)
-          setProducts(formattedProducts); anyLive = true 
+          setProducts(formattedProducts)
+        } else {
+          // Set empty array if no products found
+          setProducts([])
         }
+        
+        apiSuccess = true
+      }).catch(err => {
+        console.error('Failed to fetch products:', err)
+        // Keep mock data on error
       }),
       getAllOrders().then(res => {
         const d = res.data?.data || res.data
         const arr = Array.isArray(d) ? d : []
-        if (Array.isArray(arr) && arr.length) { setOrders(arr); anyLive = true }
+        if (Array.isArray(arr)) { 
+          setOrders(arr)
+          apiSuccess = true
+        }
       }),
       getAllUsers().then(res => {
         const d = res.data?.data || res.data
-        if (Array.isArray(d) && d.length) { setUsersList(d); anyLive = true }
+        if (Array.isArray(d) && d.length) { 
+          setUsersList(d)
+          apiSuccess = true
+        }
       }),
       getDashboardStats().then(res => {
-        if (res.data) { setDashboardStats(res.data); anyLive = true }
+        if (res.data) { 
+          setDashboardStats(res.data)
+          apiSuccess = true
+        }
       }),
-      getUserRegistrationTrends().then(res => {
-        const d = res.data?.data || res.data
-        if (Array.isArray(d)) setRegistrationTrends(d)
+      getUserRegistrationTrends({ days: 30 }).then(res => {
+        const d = res.data?.trends || res.data
+        if (Array.isArray(d)) { 
+          setRegistrationTrends(d)
+          apiSuccess = true
+        }
       }),
       getActivityLog({ per_page: 50 }).then(res => {
         const d = res.data?.activities?.data || res.data?.activities || res.data?.data || res.data
-        if (Array.isArray(d)) setActivityLogs(d)
+        if (Array.isArray(d)) { 
+          setActivityLogs(d)
+          apiSuccess = true
+        }
       }),
       getNormalUserActivity({ per_page: 50 }).then(res => {
         const d = res.data?.activities?.data || res.data?.activities || res.data?.data || res.data
-        if (Array.isArray(d)) setNormalActivity(d)
+        if (Array.isArray(d)) { 
+          setNormalActivity(d)
+          apiSuccess = true
+        }
       }),
     ])
 
-    setDataSource(anyLive ? 'live' : 'mock')
+    setDataSource(apiSuccess ? 'live' : 'mock')
     setRefreshing(false)
   }, [])
 
