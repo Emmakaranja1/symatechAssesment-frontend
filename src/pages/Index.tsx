@@ -21,39 +21,33 @@ const Index = () => {
       try {
         // First try public products endpoint
         const res = await client.get('/products')
-        console.log('Public /products response:', res.data)
         const data = res.data?.data || res.data
         if (Array.isArray(data) && data.length > 0) {
-          console.log('Setting products from public API:', data.length)
           setProducts(data)
           return
         }
       } catch (error) {
-        console.log('Public /products failed, trying admin/products')
+        // Public products failed, trying admin endpoint
       }
 
       try {
         // Try admin products (might work with token)
         const res = await client.get('/admin/products')
-        console.log('Admin /admin/products response:', res.data)
         const data = res.data?.data || res.data
         if (Array.isArray(data) && data.length > 0) {
-          console.log('Setting products from admin API:', data.length)
           setProducts(data)
           return
         }
       } catch (error) {
-        console.log('Admin /admin/products failed')
+        // Admin products failed, using mock data
       }
 
-      console.log('Keeping mock data - no API products found')
       // Ensure we always have products to display
       setProducts(mockProducts)
     }
 
     fetchProducts()
       .catch((error) => {
-        console.error('All API calls failed:', error)
         setProducts(mockProducts)
       })
       .finally(() => setLoading(false))

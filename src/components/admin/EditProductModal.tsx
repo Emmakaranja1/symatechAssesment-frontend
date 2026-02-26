@@ -76,6 +76,7 @@ export function EditProductModal({ open, onOpenChange, product, onSuccess }: Edi
         stock: Number(form.stock),
         description: form.description,
         image: form.image,
+        images: form.image ? [form.image] : [],
         rating: Number(form.rating),
       })
       toast({ title: 'Product updated', description: `${form.name} has been updated successfully.` })

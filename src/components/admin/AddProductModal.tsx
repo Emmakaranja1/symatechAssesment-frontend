@@ -45,6 +45,7 @@ export function AddProductModal({ open, onOpenChange, onSuccess }: AddProductMod
         stock: Number(form.stock),
         description: form.description,
         image: form.image,
+        images: form.image ? [form.image] : [],
         rating: Number(form.rating),
         active: true,
         featured: false,

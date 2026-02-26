@@ -13,7 +13,7 @@ import { EditProductModal } from '@/components/admin/EditProductModal'
 import { ConfirmModal } from '@/components/admin/ConfirmModal'
 import { OrderDetailModal } from '@/components/admin/OrderDetailModal'
 import { toast } from '@/hooks/use-toast'
-import { getProducts, deleteProduct } from '@/api/products'
+import { getAdminProducts, deleteProduct } from '@/api/products'
 import { getAllOrders, exportOrdersExcel, exportOrdersPdf, downloadFile } from '@/api/orders'
 import { getAllUsers, activateUser, deactivateUser } from '@/api/users'
 import {
@@ -139,9 +139,16 @@ export default function AdminDashboard() {
     let anyLive = false
 
     await Promise.allSettled([
-      getProducts().then(res => {
+      getAdminProducts().then(res => {
         const d = res.data?.data || res.data
-        if (Array.isArray(d) && d.length) { setProducts(d); anyLive = true }
+        if (Array.isArray(d) && d.length) { 
+          const formattedProducts = d.map((p: any) => ({
+            ...p,
+            name: p.name || p.title || 'Untitled Product',
+            images: p.images || (p.image ? [p.image] : [])
+          }))
+          setProducts(formattedProducts); anyLive = true 
+        }
       }),
       getAllOrders().then(res => {
         const d = res.data?.data || res.data

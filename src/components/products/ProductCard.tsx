@@ -12,12 +12,15 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart()
+  
+  // Handle both image and images array
+  const productImage = product.images?.[0] || product.image
 
   return (
     <Card className="group overflow-hidden transition-shadow hover:shadow-lg">
       <Link to={`/product/${product.id}`} className="block relative aspect-[4/3] overflow-hidden bg-muted">
         <img
-          src={product.image}
+          src={productImage}
           alt={product.title || product.name}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {
