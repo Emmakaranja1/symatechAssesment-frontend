@@ -22,7 +22,7 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
 
-  // Hide user-facing navigation for admins
+  // Hide user-facing navigation links for admins
   const showUserNavigation = isAuthenticated && !isAdmin
 
   const handleLogout = async () => {
@@ -36,7 +36,7 @@ export function Header() {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 font-display font-bold text-xl text-primary">
           <Package className="h-6 w-6" />
-          <span className="hidden sm:block">Symatech Labs</span>
+          <span className="hidden sm:block">EcommerceApp</span>
         </Link>
 
         {/* Desktop Nav */}
@@ -56,7 +56,7 @@ export function Header() {
 
         {/* Search */}
         <div className="hidden md:flex flex-1 max-w-xs ml-auto">
-          {showUserNavigation && searchOpen && (
+          {!isAdmin && searchOpen && (
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Search products..." className="pl-9" autoFocus onBlur={() => setSearchOpen(false)} />
@@ -67,13 +67,13 @@ export function Header() {
         {/* Actions */}
         <div className="flex items-center gap-1 ml-auto md:ml-0">
           <ThemeToggle />
-          {showUserNavigation && (
+          {!isAdmin && (
             <Button variant="ghost" size="icon" onClick={() => setSearchOpen(!searchOpen)} className="hidden md:flex">
               <Search className="h-5 w-5" />
             </Button>
           )}
 
-          {showUserNavigation && (
+          {!isAdmin && (
             <Link to="/cart" className="relative">
               <Button variant="ghost" size="icon">
                 <ShoppingCart className="h-5 w-5" />
@@ -131,6 +131,15 @@ export function Header() {
               {link.label}
             </Link>
           ))}
+          {!isAdmin && (
+            <Link
+              to="/cart"
+              onClick={() => setMobileOpen(false)}
+              className="rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            >
+              Cart ({totalItems})
+            </Link>
+          )}
           {isAdmin && (
             <Link
               to="/admin"
