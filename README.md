@@ -98,6 +98,10 @@ The frontend sends the phone number and amount to the backend, which triggers a 
 ### Flutterwave
 Uses the Flutterwave JavaScript SDK to open a payment modal. On successful payment, the order is created via the backend API.
 
+
+## Trello Board link
+https://trello.com/invite/b/6994b0e3454e156f7458c656/ATTIc6e66c8204cb61de504ef28759ae41c7539638A8/symatech-full-stack-assessment-sprint
+
 ## Deployment
 
 Deploy to Vercel:
