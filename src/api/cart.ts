@@ -26,6 +26,9 @@ export const getCart = () =>
 export const getCartSummary = () =>
   client.get('/redis/cart/summary', { params: { user_id: getUserId() } })
 
+export const getCartCount = () =>
+  client.get('/redis/cart/count', { params: { user_id: getUserId() } })
+
 
 export const addToCart = (product_id: number, quantity: number) =>
   client.post('/redis/cart/add', {
