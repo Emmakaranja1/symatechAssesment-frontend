@@ -16,14 +16,9 @@ export function ProductCard({ product }: ProductCardProps) {
   // Handle both image and images array
   const productImage = product.images?.[0] || product.image
   
-  // Handle image error with proper fallback
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const img = e.target as HTMLImageElement
-    // Only set fallback if the current src is not already the fallback
-    if (!img.src.includes('images.unsplash.com/photo-1560343090-f0409e92791a')) {
-      img.src = 'https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&h=300&fit=crop'
-    }
-  }
+  // Debug logging
+  console.log('ProductCard - product:', product)
+  console.log('ProductCard - productImage:', productImage)
 
   return (
     <Card className="group overflow-hidden transition-shadow hover:shadow-lg">
@@ -32,7 +27,6 @@ export function ProductCard({ product }: ProductCardProps) {
           src={productImage}
           alt={product.title || product.name}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          onError={handleImageError}
         />
         {product.stock < 10 && (
           <Badge className="absolute top-2 left-2 bg-warning text-warning-foreground text-xs">

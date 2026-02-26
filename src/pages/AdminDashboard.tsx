@@ -139,12 +139,15 @@ export default function AdminDashboard() {
     await Promise.allSettled([
       getAdminProducts().then(res => {
         const d = res.data?.data || res.data
+        console.log('Admin products response:', res)
+        console.log('Products data:', d)
         if (Array.isArray(d) && d.length) { 
           const formattedProducts = d.map((p: any) => ({
             ...p,
             name: p.name || p.title || 'Untitled Product',
             images: p.images || (p.image ? [p.image] : [])
           }))
+          console.log('Formatted products:', formattedProducts)
           setProducts(formattedProducts); anyLive = true 
         }
       }),
