@@ -26,6 +26,7 @@ export function AddProductModal({ open, onOpenChange, onSuccess }: AddProductMod
     stock: '',
     description: '',
     image: '',
+    rating: '',
   })
   const [loading, setLoading] = useState(false)
 
@@ -40,9 +41,10 @@ export function AddProductModal({ open, onOpenChange, onSuccess }: AddProductMod
         stock: Number(form.stock),
         description: form.description,
         image: form.image,
+        rating: Number(form.rating),
       })
       toast({ title: 'Product added', description: `${form.title} has been added successfully.` })
-      setForm({ title: '', category: '', price: '', stock: '', description: '', image: '' })
+      setForm({ title: '', category: '', price: '', stock: '', description: '', image: '', rating: '' })
       onOpenChange(false)
       onSuccess?.()
     } catch {
@@ -97,6 +99,19 @@ export function AddProductModal({ open, onOpenChange, onSuccess }: AddProductMod
                 min="0"
                 value={form.stock}
                 onChange={(e) => setForm({ ...form, stock: e.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="rating">Rating (0-5)</Label>
+              <Input
+                id="rating"
+                type="number"
+                min="0"
+                max="5"
+                step="0.1"
+                value={form.rating}
+                onChange={(e) => setForm({ ...form, rating: e.target.value })}
                 required
               />
             </div>

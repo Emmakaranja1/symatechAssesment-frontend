@@ -44,6 +44,7 @@ export function EditProductModal({ open, onOpenChange, product, onSuccess }: Edi
     stock: '',
     description: '',
     image: '',
+    rating: '',
   })
   const [loading, setLoading] = useState(false)
 
@@ -57,6 +58,7 @@ export function EditProductModal({ open, onOpenChange, product, onSuccess }: Edi
         stock: String(product.stock || ''),
         description: product.description || '',
         image: product.images?.[0] || product.image || '',
+        rating: String(product.rating || ''),
       })
     }
   }, [product])
@@ -74,6 +76,7 @@ export function EditProductModal({ open, onOpenChange, product, onSuccess }: Edi
         stock: Number(form.stock),
         description: form.description,
         image: form.image,
+        rating: Number(form.rating),
       })
       toast({ title: 'Product updated', description: `${form.name} has been updated successfully.` })
       onOpenChange(false)
@@ -131,6 +134,19 @@ export function EditProductModal({ open, onOpenChange, product, onSuccess }: Edi
                 min="0"
                 value={form.stock}
                 onChange={(e) => setForm({ ...form, stock: e.target.value })}
+                required
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="rating">Rating (0-5)</Label>
+              <Input
+                id="rating"
+                type="number"
+                min="0"
+                max="5"
+                step="0.1"
+                value={form.rating}
+                onChange={(e) => setForm({ ...form, rating: e.target.value })}
                 required
               />
             </div>

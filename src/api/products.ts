@@ -15,6 +15,7 @@ export interface CreateProductPayload {
   category: string
   stock: number
   image?: string
+  rating?: number
 }
 
 export interface UpdateProductPayload {
@@ -24,6 +25,7 @@ export interface UpdateProductPayload {
   category?: string
   stock?: number
   image?: string
+  rating?: number
 }
 
 
