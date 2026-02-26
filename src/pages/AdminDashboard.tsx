@@ -119,9 +119,7 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('')
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  const [products, setProducts] = useState<AdminProduct[]>(
-    mockProducts.map(p => ({ ...p, name: p.title || p.name || 'Untitled Product', images: [p.image] }))
-  )
+  const [products, setProducts] = useState<AdminProduct[]>([])
   const [orders, setOrders] = useState<AdminOrder[]>([])
   const [usersList, setUsersList] = useState<AdminUser[]>(
     mockUsers.map(u => ({ ...u, status: u.active ? 'active' : 'inactive' }))
