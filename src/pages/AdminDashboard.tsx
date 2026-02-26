@@ -138,7 +138,7 @@ export default function AdminDashboard() {
 
     await Promise.allSettled([
       getAdminProducts().then(res => {
-        const d = res.data?.data || res.data
+        const d = res.data?.data?.products || res.data?.products || res.data?.data || res.data
         console.log('Admin products response:', res)
         console.log('Products data:', d)
         if (Array.isArray(d) && d.length) { 
